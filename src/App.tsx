@@ -51,8 +51,14 @@ function App() {
       {/* Live2D Canvas - 全局管理，始终存在但只在chat页面可见 */}
       <canvas
         ref={canvasRef}
-        className={`absolute inset-0 w-full h-full ${currentPage === 'chat' ? 'block' : 'hidden'}`}
-        style={{ width: '100vw', height: '100vh', zIndex: 10 }}
+        className="absolute inset-0 w-full h-full"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          zIndex: 10,
+          opacity: currentPage === 'chat' ? 1 : 0,
+          pointerEvents: currentPage === 'chat' ? 'auto' : 'none'
+        }}
       />
       {renderPage()}
     </div>
