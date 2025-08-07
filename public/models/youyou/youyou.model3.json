@@ -1,0 +1,138 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "youyou.moc3",
+		"Textures": [
+			"textures/texture_00.png",
+			"textures/texture_01.png"
+		],
+		"Physics": "youyou.physics3.json",
+		"DisplayInfo": "youyou.cdi3.json",
+		"Expressions": [
+			{
+				"Name": "aojiao",
+				"File": "aojiao.exp3.json"
+			},
+			{
+				"Name": "baoxiong",
+				"File": "baoxiong.exp3.json"
+			},
+			{
+				"Name": "chayao",
+				"File": "chayao.exp3.json"
+			},
+			{
+				"Name": "diannao",
+				"File": "diannao.exp3.json"
+			},
+			{
+				"Name": "diannaofaguang",
+				"File": "diannaofaguang.exp3.json"
+			},
+			{
+				"Name": "guilian",
+				"File": "guilian.exp3.json"
+			},
+			{
+				"Name": "hahadadxiao",
+				"File": "hahadadxiao.exp3.json"
+			},
+			{
+				"Name": "haixiu",
+				"File": "haixiu.exp3.json"
+			},
+			{
+				"Name": "huishou_exp",
+				"File": "huishou.exp3.json"
+			},
+			{
+				"Name": "jianpantaiqi",
+				"File": "jianpantaiqi.exp3.json"
+			},
+			{
+				"Name": "jingxi",
+				"File": "jingxi.exp3.json"
+			},
+			{
+				"Name": "jingya",
+				"File": "jingya.exp3.json"
+			},
+			{
+				"Name": "lianhong",
+				"File": "lianhong.exp3.json"
+			},
+			{
+				"Name": "luolei",
+				"File": "luolei.exp3.json"
+			},
+			{
+				"Name": "mimiyan",
+				"File": "mimiyan.exp3.json"
+			},
+			{
+				"Name": "shengqi",
+				"File": "shengqi.exp3.json"
+			},
+			{
+				"Name": "tuosai",
+				"File": "tuosai.exp3.json"
+			},
+			{
+				"Name": "weiqu",
+				"File": "weiqu.exp3.json"
+			},
+			{
+				"Name": "wenroudexiao",
+				"File": "wenroudexiao.exp3.json"
+			},
+			{
+				"Name": "yanlei",
+				"File": "yanlei.exp3.json"
+			}
+		],
+		"Motions": {
+			"Idle": [
+				{
+					"File": "jichudonghua.motion3.json"
+				},
+				{
+					"File": "sleep.motion3.json"
+				}
+			],
+			"TapBody": [
+				{
+					"File": "huishou.motion3.json"
+				},
+				{
+					"File": "diantou.motion3.json"
+				},
+				{
+					"File": "yaotou.motion3.json"
+				}
+			],
+			"TapHead": [
+				{
+					"File": "yanzhuzi.motion3.json"
+				},
+				{
+					"File": "shuijiao.motion3.json"
+				}
+			]
+		}
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		}
+	]
+}

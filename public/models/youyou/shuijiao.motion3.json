@@ -1,0 +1,732 @@
+{
+	"Version": 3,
+	"Meta": {
+		"Duration": 25.22,
+		"Fps": 60.0,
+		"Loop": true,
+		"AreBeziersRestricted": true,
+		"CurveCount": 42,
+		"TotalSegmentCount": 76,
+		"TotalPointCount": 194,
+		"UserDataCount": 0,
+		"TotalUserDataSize": 0
+	},
+	"Curves": [
+		{
+			"Target": "Parameter",
+			"Id": "ParamAngleY",
+			"Segments": [
+				0,
+				0,
+				1,
+				0.583,
+				0,
+				1.167,
+				-30,
+				1.75,
+				-30,
+				1,
+				2.194,
+				-30,
+				2.639,
+				-16,
+				3.083,
+				-16,
+				1,
+				3.472,
+				-16,
+				3.861,
+				-30,
+				4.25,
+				-30,
+				1,
+				4.767,
+				-30,
+				5.283,
+				-16,
+				5.8,
+				-16,
+				1,
+				6.356,
+				-16,
+				6.911,
+				-30,
+				7.467,
+				-30,
+				1,
+				8.011,
+				-30,
+				8.556,
+				-16,
+				9.1,
+				-16,
+				1,
+				9.6,
+				-16,
+				10.1,
+				-30,
+				10.6,
+				-30,
+				1,
+				11.144,
+				-30,
+				11.689,
+				-16,
+				12.233,
+				-16,
+				1,
+				12.761,
+				-16,
+				13.289,
+				-30,
+				13.817,
+				-30,
+				1,
+				14.361,
+				-30,
+				14.906,
+				-16,
+				15.45,
+				-16,
+				1,
+				15.95,
+				-16,
+				16.45,
+				-30,
+				16.95,
+				-30,
+				1,
+				17.494,
+				-30,
+				18.039,
+				-16,
+				18.583,
+				-16,
+				1,
+				19.194,
+				-16,
+				19.806,
+				-30,
+				20.417,
+				-30,
+				1,
+				20.961,
+				-30,
+				21.506,
+				-16,
+				22.05,
+				-16,
+				1,
+				22.55,
+				-16,
+				23.05,
+				-30,
+				23.55,
+				-30,
+				1,
+				24.106,
+				-30,
+				24.661,
+				0,
+				25.217,
+				0
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Id": "ParamAngleZ",
+			"Segments": [
+				0,
+				0,
+				1,
+				0.583,
+				0,
+				1.167,
+				11,
+				1.75,
+				11,
+				1,
+				2.194,
+				11,
+				2.639,
+				6,
+				3.083,
+				6,
+				1,
+				3.472,
+				6,
+				3.861,
+				11,
+				4.25,
+				11,
+				1,
+				4.767,
+				11,
+				5.283,
+				6,
+				5.8,
+				6,
+				1,
+				6.356,
+				6,
+				6.911,
+				11,
+				7.467,
+				11,
+				1,
+				8.011,
+				11,
+				8.556,
+				6,
+				9.1,
+				6,
+				1,
+				9.6,
+				6,
+				10.1,
+				11,
+				10.6,
+				11,
+				1,
+				11.144,
+				11,
+				11.689,
+				6,
+				12.233,
+				6,
+				1,
+				12.761,
+				6,
+				13.289,
+				11,
+				13.817,
+				11,
+				1,
+				14.361,
+				11,
+				14.906,
+				6,
+				15.45,
+				6,
+				1,
+				15.95,
+				6,
+				16.45,
+				11,
+				16.95,
+				11,
+				1,
+				17.494,
+				11,
+				18.039,
+				6,
+				18.583,
+				6,
+				1,
+				19.194,
+				6,
+				19.806,
+				11,
+				20.417,
+				11,
+				1,
+				20.961,
+				11,
+				21.506,
+				6,
+				22.05,
+				6,
+				1,
+				22.55,
+				6,
+				23.05,
+				11,
+				23.55,
+				11,
+				1,
+				24.106,
+				11,
+				24.661,
+				0,
+				25.217,
+				0
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Id": "ParamEyeLOpen",
+			"Segments": [
+				0,
+				1,
+				1,
+				0.544,
+				1,
+				1.089,
+				0,
+				1.633,
+				0,
+				1,
+				8.939,
+				0,
+				16.244,
+				0,
+				23.55,
+				0,
+				1,
+				24.106,
+				0,
+				24.661,
+				1,
+				25.217,
+				1
+			]
+		},
+		{
+			"Target": "Parameter",
+			"Id": "ParamEyeROpen",
+			"Segments": [
+				0,
+				1,
+				1,
+				0.544,
+				1,
+				1.089,
+				0,
+				1.633,
+				0,
+				1,
+				8.939,
+				0,
+				16.244,
+				0,
+				23.55,
+				0,
+				1,
+				24.106,
+				0,
+				24.661,
+				1,
+				25.217,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part14",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part2",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part42",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part41",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part40",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part39",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part38",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part81",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part3",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part6",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part44",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part45",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part66",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part67",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part69",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part70",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part4",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part5",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part9",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part10",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part12",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part7",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part8",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part11",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part15",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part16",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part20",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part23",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part13",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part25",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part27",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part28",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part29",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part30",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part31",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part36",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		},
+		{
+			"Target": "PartOpacity",
+			"Id": "Part37",
+			"Segments": [
+				0,
+				1,
+				0,
+				25.22,
+				1
+			]
+		}
+	]
+}
