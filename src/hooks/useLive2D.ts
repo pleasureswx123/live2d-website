@@ -56,7 +56,7 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
         view: canvasRef.current,
         width: window.innerWidth,
         height: window.innerHeight,
-        backgroundColor: 0x000000,
+        backgroundAlpha: 0, // 设置背景透明
         autoDensity: true,
         antialias: true,
         resolution: window.devicePixelRatio || 1,
