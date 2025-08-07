@@ -73,7 +73,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
   }
 
   return (
-    <div className="relative w-full h-screen bg-black overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden">
       {/* 临时占位符 */}
       {!live2dState.isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
@@ -162,6 +162,7 @@ const ChatPage: React.FC<ChatPageProps> = ({
             <Drawer.Overlay className="fixed inset-0 bg-black/40 z-40" />
             <Drawer.Content className="bg-gray-900 flex flex-col rounded-l-[10px] h-full fixed top-0 right-0 w-96 z-50">
               <div className="p-4 bg-gray-900 rounded-l-[10px] flex-1 overflow-y-auto">
+                <Drawer.Title className="sr-only">模型控制面板</Drawer.Title>
                 <div className="w-1.5 h-12 flex-shrink-0 rounded-full bg-gray-600 mb-8 mx-auto" />
                 <ControlPanel
                   live2dState={live2dState}

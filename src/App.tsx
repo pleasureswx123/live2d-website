@@ -35,14 +35,25 @@ function App() {
 
   return (
     <div className="min-h-screen bg-black relative">
-      {/* Live2D Canvas - 全局管理 */}
+      {/* 背景视频 - 只在chat页面显示 */}
       {currentPage === 'chat' && (
-        <canvas
-          ref={canvasRef}
-          className="absolute inset-0 w-full h-full"
-          style={{ width: '100vw', height: '100vh' }}
-        />
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src="/video/live2d_bg.mp4" type="video/mp4" />
+        </video>
       )}
+
+      {/* Live2D Canvas - 全局管理，始终存在但只在chat页面可见 */}
+      <canvas
+        ref={canvasRef}
+        className={`absolute inset-0 w-full h-full ${currentPage === 'chat' ? 'block' : 'hidden'}`}
+        style={{ width: '100vw', height: '100vh', zIndex: 10 }}
+      />
       {renderPage()}
     </div>
   )

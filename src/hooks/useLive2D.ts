@@ -173,7 +173,8 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
 
     try {
       console.log(`播放动作: 组=${group}, 索引=${index}`)
-      await modelRef.current.motion(group, index, MotionPriority.NORMAL)
+      // 使用正确的API调用方式
+      await modelRef.current.motion(group, index)
     } catch (error) {
       console.error('播放动作失败:', error)
     }
@@ -217,15 +218,22 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
   // 自动调整模型位置和大小
   const autoFitModel = useCallback((model: Live2DModel, canvasWidth: number, canvasHeight: number) => {
     try {
-      // 设置基础缩放
-      const scale = Math.min(canvasWidth / 1000, canvasHeight / 1000) * 0.8
+      // 获取模型的原始尺寸
+      const modelWidth = model.width
+      const modelHeight = model.height
+
+      // 计算适合的缩放比例，确保模型完全显示在画布内
+      const scaleX = (canvasWidth * 0.6) / modelWidth  // 留出40%的边距
+      const scaleY = (canvasHeight * 0.8) / modelHeight // 留出20%的边距
+      const scale = Math.min(scaleX, scaleY, 1.0) // 不超过原始大小
+
       model.scale.set(scale)
 
-      // 居中显示
-      model.position.set(canvasWidth / 2, canvasHeight / 2)
+      // 居中显示，稍微向下偏移一点
+      model.position.set(canvasWidth / 2, canvasHeight * 0.6)
       model.anchor.set(0.5, 0.5)
 
-      console.log(`模型自动调整: scale=${scale.toFixed(3)}, position=(${model.position.x}, ${model.position.y})`)
+      console.log(`模型自动调整: scale=${scale.toFixed(3)}, position=(${model.position.x}, ${model.position.y}), modelSize=(${modelWidth}, ${modelHeight})`)
     } catch (error) {
       console.error('自动调整模型失败:', error)
     }

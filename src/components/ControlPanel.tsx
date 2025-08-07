@@ -89,7 +89,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
       {/* 表情控制 */}
       <div className="bg-gray-800/50 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-3 text-cyan-300">表情控制</h3>
-        
+
         <div className="space-y-3">
           <select
             value={selectedExpression}
@@ -111,7 +111,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
               whileTap={{ scale: 0.98 }}
               onClick={handlePlayExpression}
               disabled={!selectedExpression || !live2dState.isLoaded}
-              className="flex-1 flex items-center justify-center space-x-2 bg-cyan-500/20 text-cyan-400 border border-cyan-400/30 rounded-lg py-2 px-3 hover:bg-cyan-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center space-x-2 bg-gray-600/20 text-gray-400 border border-gray-600/30 rounded-lg py-2 px-3 hover:bg-gray-600/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Play size={16} />
               <span>播放表情</span>
@@ -133,7 +133,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
       {/* 动作控制 */}
       <div className="bg-gray-800/50 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-3 text-cyan-300">动作控制</h3>
-        
+
         <div className="space-y-3">
           <select
             value={selectedMotion}
@@ -154,7 +154,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
             whileTap={{ scale: 0.98 }}
             onClick={handlePlayMotion}
             disabled={!selectedMotion || !live2dState.isLoaded}
-            className="w-full flex items-center justify-center space-x-2 bg-green-500/20 text-green-400 border border-green-400/30 rounded-lg py-2 px-3 hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center space-x-2 bg-gray-600/20 text-gray-400 border border-gray-600/30 rounded-lg py-2 px-3 hover:bg-gray-600/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Play size={16} />
             <span>播放动作</span>
@@ -168,7 +168,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
           <Volume2 size={18} />
           <span>音量控制</span>
         </h3>
-        
+
         <div className="space-y-3">
           <div className="flex items-center space-x-3">
             <span className="text-sm text-gray-400 w-8">0</span>
@@ -191,7 +191,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
       {/* 快捷动作 */}
       <div className="bg-gray-800/50 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-3 text-cyan-300">快捷动作</h3>
-        
+
         <div className="grid grid-cols-2 gap-2">
           {['挥手', '点头', '摇头', '睡觉'].map((action, index) => (
             <motion.button
@@ -206,7 +206,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
                 }
               }}
               disabled={!live2dState.isLoaded}
-              className="bg-purple-500/20 text-purple-400 border border-purple-400/30 rounded-lg py-2 px-3 hover:bg-purple-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="bg-gray-600/20 text-gray-400 border border-gray-600/30 rounded-lg py-2 px-3 hover:bg-gray-600/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {action}
             </motion.button>
@@ -217,7 +217,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
       {/* 快捷表情 */}
       <div className="bg-gray-800/50 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-3 text-cyan-300">快捷表情</h3>
-        
+
         <div className="grid grid-cols-2 gap-2">
           {[
             { name: 'wenroudexiao', display: '微笑' },
@@ -231,7 +231,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ live2dState, live2dControls
               whileTap={{ scale: 0.98 }}
               onClick={() => live2dControls.playExpression(exp.name)}
               disabled={!live2dState.isLoaded}
-              className="bg-pink-500/20 text-pink-400 border border-pink-400/30 rounded-lg py-2 px-3 hover:bg-pink-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="bg-gray-600/20 text-gray-400 border border-gray-600/30 rounded-lg py-2 px-3 hover:bg-gray-600/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {exp.display}
             </motion.button>
