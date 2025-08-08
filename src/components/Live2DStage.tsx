@@ -16,12 +16,23 @@ function clampDPR(max: number) {
 }
 
 function layout(model: Live2DModel, w: number, h: number) {
-  const baseW = 1920
-  const baseH = 1080
-  const s = Math.min(w / baseW, h / baseH)
+  // 获取模型的原始尺寸
+  const modelWidth = model.width
+  const modelHeight = model.height
+
+  // 计算适合的缩放比例，确保模型完全显示在画布内
+  const scaleX = (w * 0.8) / modelWidth  // 留出20%的边距
+  const scaleY = (h * 0.9) / modelHeight // 留出10%的边距
+  const scale = Math.min(scaleX, scaleY, 1.0) // 不超过原始大小
+
+  // 设置锚点为模型底部中心
   model.anchor.set(0.5, 1)
-  model.scale.set(s)
-  model.position.set(w / 2, h)
+  model.scale.set(scale)
+
+  // 居中显示，稍微向下偏移一点
+  model.position.set(w / 2, h * 0.95)
+
+  console.log(`模型布局: scale=${scale.toFixed(3)}, position=(${model.position.x}, ${model.position.y}), modelSize=(${modelWidth}, ${modelHeight})`)
 }
 
 export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
@@ -51,6 +62,10 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
 
     Live2DModel.from(modelUrl).then((m) => {
       modelRef.current = m
+
+      // 注册 Ticker 以解决警告
+      ;(m as any).registerTicker?.(app.ticker)
+
       app.stage.addChild(m)
       const w = app.renderer.width / app.renderer.resolution
       const h = app.renderer.height / app.renderer.resolution
@@ -71,6 +86,12 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
       // 将实例挂载到模型上，方便外部访问
       ;(m as any).__director = director
       ;(m as any).__lipSync = lipSync
+
+      // 将实例挂载到全局，方便其他组件访问
+      ;(window as any).__live2d = {
+        model: m,
+        app: app
+      }
 
       // 初次锚点
       sendAnchor()
@@ -137,16 +158,7 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
     }
   }, [modelUrl, onAnchor])
 
-  // 暴露模型和应用实例给外部使用
-  useEffect(() => {
-    if (modelRef.current && appRef.current) {
-      // 将实例挂载到全局，方便其他组件访问
-      ;(window as any).__live2d = {
-        model: modelRef.current,
-        app: appRef.current
-      }
-    }
-  }, [modelRef.current, appRef.current])
+
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }} />
 }

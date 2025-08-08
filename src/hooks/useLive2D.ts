@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import * as PIXI from 'pixi.js'
 import { Live2DModel, SoundManager, MotionPriority } from 'pixi-live2d-display'
-import type { ModelConfig } from '@/config/modelsConfig'
 
 // 确保 PIXI 在全局可用
 if (typeof window !== 'undefined') {
@@ -20,7 +19,7 @@ export interface Live2DState {
 }
 
 export interface Live2DControls {
-  loadModel: (config: ModelConfig) => Promise<void>
+  loadModel: (modelUrl: string) => Promise<void>
   playMotion: (group: string, index?: number) => Promise<void>
   playExpression: (expressionName: string) => Promise<void>
   resetExpression: () => void
@@ -87,13 +86,13 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
   }, [])
 
   // 加载模型
-  const loadModel = useCallback(async (config: ModelConfig) => {
+  const loadModel = useCallback(async (modelUrl: string) => {
     if (!appRef.current || !appRef.current.stage) {
       console.error('PIXI 应用未初始化或stage不可用')
       // 延迟重试
       setTimeout(() => {
         if (appRef.current && appRef.current.stage) {
-          loadModel(config)
+          loadModel(modelUrl)
         }
       }, 100)
       return
@@ -109,10 +108,9 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
         modelRef.current = null
       }
 
-      console.log(`开始加载模型: ${config.displayName}`)
-      console.log(`模型路径: ${config.path}`)
+      console.log(`开始加载模型: ${modelUrl}`)
 
-      const model = await Live2DModel.from(config.path)
+      const model = await Live2DModel.from(modelUrl)
 
       if (!model) {
         throw new Error('模型加载失败')
@@ -146,10 +144,10 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
           ...prev,
           isLoaded: true,
           isLoading: false,
-          currentModel: config.id
+          currentModel: modelUrl
         }))
 
-        console.log(`模型 ${config.displayName} 加载成功`)
+        console.log(`模型加载成功: ${modelUrl}`)
       } else {
         throw new Error('PIXI stage不可用')
       }

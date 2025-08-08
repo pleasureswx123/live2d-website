@@ -12,8 +12,37 @@ async function fakeLLM(text: string): Promise<string> {
 
 export default function ChatOverlay({ anchor }: { anchor: {x:number,y:number} | null }) {
   const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
   const [typingId, setTypingId] = useState<string | null>(null)
+
+  // 监听来自 ChatPage 的消息
+  useEffect(() => {
+    const handleChatMessage = (event: CustomEvent) => {
+      const { role, text } = event.detail
+      if (role === 'assistant') {
+        const a: Message = { id: uid(), role: 'assistant', text: '' }
+        setMessages(m => [...m, a])
+        setTypingId(a.id)
+
+        // 逐字流式效果
+        let i = 0
+        const typeInterval = setInterval(() => {
+          i++
+          const slice = text.slice(0, i)
+          setMessages(m => m.map(x => x.id === a.id ? { ...x, text: slice } : x))
+
+          if (i >= text.length) {
+            clearInterval(typeInterval)
+            setTypingId(null)
+          }
+        }, 12)
+      }
+    }
+
+    window.addEventListener('chatMessage', handleChatMessage as EventListener)
+    return () => {
+      window.removeEventListener('chatMessage', handleChatMessage as EventListener)
+    }
+  }, [])
 
   // 把最后一条 assistant 贴在锚点处（也可展示全部；这里示例展示最新一条）
   const lastAssistant = useMemo(() => {
@@ -22,27 +51,6 @@ export default function ChatOverlay({ anchor }: { anchor: {x:number,y:number} | 
     }
     return null
   }, [messages])
-
-  async function handleSend() {
-    const t = input.trim()
-    if (!t) return
-    setInput('')
-    const u: Message = { id: uid(), role: 'user', text: t }
-    setMessages(m => [...m, u])
-
-    const a: Message = { id: uid(), role: 'assistant', text: '' }
-    setMessages(m => [...m, a])
-    setTypingId(a.id)
-
-    const full = await fakeLLM(t)
-    // 逐字流式效果
-    for (let i = 1; i <= full.length; i++) {
-      const slice = full.slice(0, i)
-      setMessages(m => m.map(x => x.id === a.id ? { ...x, text: slice } : x))
-      await new Promise(r => setTimeout(r, 12)) // 打字速度
-    }
-    setTypingId(null)
-  }
 
   return (
     <div className="pointer-events-none absolute inset-0 select-none">
@@ -69,23 +77,7 @@ export default function ChatOverlay({ anchor }: { anchor: {x:number,y:number} | 
         )}
       </AnimatePresence>
 
-      {/* 输入框 */}
-      <div className="pointer-events-auto absolute inset-x-0 bottom-3 flex w-full justify-center">
-        <div className="flex w-[min(720px,92vw)] items-center gap-2 rounded-2xl bg-white/90 px-3 py-2 shadow ring-1 ring-black/10">
-          <input
-            className="flex-1 bg-transparent outline-none placeholder:text-gray-400"
-            placeholder="和角色聊天…"
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => (e.key === 'Enter' ? handleSend() : null)}
-          />
-          <button
-            className="rounded-xl bg-black px-3 py-1.5 text-white disabled:opacity-50"
-            onClick={handleSend}
-            disabled={!input.trim()}
-          >发送</button>
-        </div>
-      </div>
+
     </div>
   )
 }
