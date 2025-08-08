@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Play, RotateCcw, Volume2, Mic, MicOff } from 'lucide-react'
+import testAudio from '@/assets/test.wav'
 
 interface ControlPanelProps {
   isOpen: boolean
@@ -13,7 +14,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
   const [volume, setVolume] = useState(70)
   const [isTestingLipSync, setIsTestingLipSync] = useState(false)
 
-  // 可用的表情列表
+  // 可用的表情列表 - 使用模型文件中的实际名称
   const expressions = [
     { id: 'aojiao', name: '傲娇' },
     { id: 'chayao', name: '叉腰' },
@@ -24,52 +25,78 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
     { id: 'jingya', name: '惊讶' },
     { id: 'tuosai', name: '托腮' },
     { id: 'baoxiong', name: '抱胸' },
+    { id: 'huishou', name: '挥手（表情）' }, // 注意：这是表情不是动作
     { id: 'wenroudexiao', name: '温柔的笑' },
     { id: 'shengqi', name: '生气' },
     { id: 'diannao', name: '电脑' },
+    { id: 'diannaofaguang', name: '电脑发光' },
     { id: 'mimiyan', name: '眯眯眼' },
+    { id: 'yanlei', name: '眼泪' },
     { id: 'lianhong', name: '脸红' },
+    { id: 'luolei', name: '落泪' },
+    { id: 'jianpantaiqi', name: '键盘抬起' },
     { id: 'guilian', name: '鬼脸' }
   ]
 
-  // 可用的动作列表
+  // 可用的动作列表 - 使用模型文件中的实际组名和动作
   const motions = [
-    { id: 'huishou', name: '挥手', group: 'TapBody' },
-    { id: 'diantou', name: '点头', group: 'TapBody' },
-    { id: 'yaotou', name: '摇头', group: 'TapBody' },
-    { id: 'yanzhuzi', name: '眼珠子', group: 'TapHead' },
-    { id: 'shuijiao', name: '睡觉', group: 'TapHead' },
-    { id: 'jichudonghua', name: '基础动画', group: 'Idle' },
-    { id: 'sleep', name: '睡眠', group: 'Idle' }
+    { id: 'huishou_motion', name: '挥手', group: 'TapBody', index: 0 },
+    { id: 'diantou', name: '点头', group: 'TapBody', index: 1 },
+    { id: 'yaotou', name: '摇头', group: 'TapBody', index: 2 },
+    { id: 'yanzhuzi', name: '眼珠子', group: 'TapHead', index: 0 },
+    { id: 'shuijiao', name: '睡觉', group: 'TapHead', index: 1 },
+    { id: 'sleep', name: '睡眠', group: 'Idle', index: 0 },
+    { id: 'jichudonghua', name: '基础动画', group: 'Idle', index: 1 }
   ]
 
   // 播放表情
   const handlePlayExpression = () => {
+    debugger
     if (!selectedExpression) return
+    console.log(`[ControlPanel] 请求播放表情: ${selectedExpression}`)
+    
     const live2d = (window as any).__live2d
-    if (live2d?.model) {
-      const director = live2d.model.__director
-      if (director) {
-        director.setExpression(selectedExpression)
-        console.log(`播放表情: ${selectedExpression}`)
-      }
+    if (!live2d?.model) {
+      console.error('[ControlPanel] Live2D 模型未加载')
+      return
     }
+    
+    const director = live2d.model.__director
+    if (!director) {
+      console.error('[ControlPanel] 动画导演未初始化')
+      return
+    }
+    
+    console.log('[ControlPanel] 调用 director.setExpression')
+    director.setExpression(selectedExpression)
   }
 
   // 播放动作
   const handlePlayMotion = () => {
+    debugger
     if (!selectedMotion) return
+    console.log(`[ControlPanel] 请求播放动作: ${selectedMotion}`)
+    
     const live2d = (window as any).__live2d
-    if (live2d?.model) {
-      const director = live2d.model.__director
-      if (director) {
-        const motion = motions.find(m => m.id === selectedMotion)
-        if (motion) {
-          director.playMotion(motion.group, { index: 0 })
-          console.log(`播放动作: ${motion.name} (${motion.group})`)
-        }
-      }
+    if (!live2d?.model) {
+      console.error('[ControlPanel] Live2D 模型未加载')
+      return
     }
+    
+    const director = live2d.model.__director
+    if (!director) {
+      console.error('[ControlPanel] 动画导演未初始化')
+      return
+    }
+    
+    const motion = motions.find(m => m.id === selectedMotion)
+    if (!motion) {
+      console.error(`[ControlPanel] 找不到动作定义: ${selectedMotion}`)
+      return
+    }
+    
+    console.log(`[ControlPanel] 调用 director.playMotion: ${motion.group}[${motion.index}]`)
+    director.playMotion(motion.group, { index: motion.index })
   }
 
   // 重置表情
@@ -87,7 +114,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
   }
 
   // 测试口型同步
-  const handleTestLipSync = () => {
+  const handleTestLipSync = async () => {
     const live2d = (window as any).__live2d
     if (live2d?.model) {
       const director = live2d.model.__director
@@ -97,18 +124,38 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
         if (!isTestingLipSync) {
           // 开始说话测试
           director.speakStart({ mood: 'happy' })
+          // 请求麦克风并启动口型同步
+          try {
+            console.log('[ControlPanel] 请求麦克风权限...')
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+            console.log('[ControlPanel] 麦克风权限获取成功，启动麦克风口型同步')
+            await lipSync.fromStream(stream)
+          } catch (e) {
+            console.warn('[ControlPanel] 无法访问麦克风，改用测试音频。', e)
+            const el = new Audio(testAudio)
+            el.loop = true
+            el.volume = volume / 100
+            console.log('[ControlPanel] 启动测试音频口型同步')
+            el.play().catch(()=>{})
+            ;(window as any).__live2dTestAudio = el
+            await lipSync.fromMediaElement(el)
+          }
           setIsTestingLipSync(true)
           console.log('开始口型测试')
           
           // 5秒后自动停止
           setTimeout(() => {
             director.speakStop()
+            try { lipSync.stop() } catch {}
+            try { (window as any).__live2dTestAudio = null } catch {}
             setIsTestingLipSync(false)
             console.log('口型测试结束')
           }, 5000)
         } else {
           // 手动停止
           director.speakStop()
+          try { lipSync.stop() } catch {}
+          try { (window as any).__live2dTestAudio = null } catch {}
           setIsTestingLipSync(false)
           console.log('手动停止口型测试')
         }
@@ -119,7 +166,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
   // 设置音量
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume)
-    // 这里可以设置 Live2D 的音量
+    // 调整测试音频音量（麦克风路径不直接回放音量控制，避免回声）
+    const el: HTMLAudioElement | undefined = (window as any).__live2dTestAudio
+    if (el) el.volume = Math.max(0, Math.min(1, newVolume / 100))
     console.log(`设置音量: ${newVolume}%`)
   }
 

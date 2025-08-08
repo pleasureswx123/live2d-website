@@ -16,23 +16,19 @@ function clampDPR(max: number) {
 }
 
 function layout(model: Live2DModel, w: number, h: number) {
-  // 获取模型的原始尺寸
-  const modelWidth = model.width
-  const modelHeight = model.height
+  // 使用原始逻辑尺寸（避免因上一次缩放导致测量漂移）
+  const anyModel: any = model as any
+  const logicalW = anyModel.width ?? 1
+  const logicalH = anyModel.height ?? 1
 
-  // 计算适合的缩放比例，确保模型完全显示在画布内
-  const scaleX = (w * 0.8) / modelWidth  // 留出20%的边距
-  const scaleY = (h * 0.9) / modelHeight // 留出10%的边距
-  const scale = Math.min(scaleX, scaleY, 1.0) // 不超过原始大小
+  // 留边，按短边适配
+  const scaleX = (w * 0.82) / logicalW
+  const scaleY = (h * 0.92) / logicalH
+  const scale = Math.min(scaleX, scaleY)
 
-  // 设置锚点为模型底部中心
   model.anchor.set(0.5, 1)
   model.scale.set(scale)
-
-  // 居中显示，稍微向下偏移一点
-  model.position.set(w / 2, h * 0.95)
-
-  console.log(`模型布局: scale=${scale.toFixed(3)}, position=(${model.position.x}, ${model.position.y}), modelSize=(${modelWidth}, ${modelHeight})`)
+  model.position.set(w / 2, h)
 }
 
 export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
@@ -63,8 +59,17 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
     Live2DModel.from(modelUrl).then((m) => {
       modelRef.current = m
 
-      // 注册 Ticker 以解决警告
-      ;(m as any).registerTicker?.(app.ticker)
+      // 正确注册 Ticker（Cubism4 需要手动调用）
+      if (typeof (m as any).registerTicker === 'function') {
+        (m as any).registerTicker(app.ticker)
+      }
+
+      // 添加模型更新循环（关键！）
+      app.ticker.add(() => {
+        if (modelRef.current) {
+          modelRef.current.update(app.ticker.deltaMS)
+        }
+      })
 
       app.stage.addChild(m)
       const w = app.renderer.width / app.renderer.resolution
@@ -124,13 +129,22 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
       }
     })
 
+    let resizeQueued = false
     const ro = new ResizeObserver(() => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+      // 合并高频 resize 回调，避免忽闪
+      if (resizeQueued) return
+      resizeQueued = true
       rafRef.current = requestAnimationFrame(() => {
+        resizeQueued = false
         const w = el.clientWidth
         const h = el.clientHeight
-        app.renderer.resolution = clampDPR(2)
-        app.renderer.resize(w, h)
+        // 仅当尺寸变化时再触发 renderer.resize
+        const view = app.view as HTMLCanvasElement
+        const needResize = view.width !== Math.floor(w * app.renderer.resolution) || view.height !== Math.floor(h * app.renderer.resolution)
+        if (needResize) {
+          app.renderer.resolution = clampDPR(2)
+          app.renderer.resize(w, h)
+        }
         if (modelRef.current) {
           layout(modelRef.current, w, h)
           sendAnchor()

@@ -4,6 +4,7 @@ import type { Live2DModel } from 'pixi-live2d-display/cubism4'
 export type LipSyncHandle = {
   fromMediaElement(el: HTMLAudioElement): Promise<() => void> // 返回解绑函数
   fromStream(stream: MediaStream): Promise<() => void>
+  fromTestTone(opts?: { frequency?: number; volume?: number }): Promise<() => void>
   stop(): void
 }
 
@@ -33,16 +34,32 @@ export function createLipSync(app: PIXI.Application, model: Live2DModel, opts?: 
 
   let level = 0
   let running = false
+  let nodeCleanup: (() => void) | null = null
 
   function setParam(id: string, v: number) {
     const anyModel: any = model as any
-    if (typeof anyModel.setParameterValueById === 'function') anyModel.setParameterValueById(id, v)
-    else anyModel.internalModel?.coreModel?.setParameterValueById?.(id, v)
+    const coreModel = anyModel.internalModel?.coreModel
+    
+    if (coreModel && typeof coreModel.setParameterValueById === 'function') {
+      coreModel.setParameterValueById(id, v)
+    } else if (typeof anyModel.setParameterValueById === 'function') {
+      anyModel.setParameterValueById(id, v)
+    } else {
+      console.warn(`[LipSync] 无法设置参数 ${id} = ${v}`)
+    }
   }
+  
   function addParam(id: string, v: number, weight = 1) {
     const anyModel: any = model as any
-    if (typeof anyModel.addParameterValueById === 'function') anyModel.addParameterValueById(id, v, weight)
-    else anyModel.internalModel?.coreModel?.addParameterValueById?.(id, v, weight)
+    const coreModel = anyModel.internalModel?.coreModel
+    
+    if (coreModel && typeof coreModel.addParameterValueById === 'function') {
+      coreModel.addParameterValueById(id, v, weight)
+    } else if (typeof anyModel.addParameterValueById === 'function') {
+      anyModel.addParameterValueById(id, v, weight)
+    } else {
+      console.warn(`[LipSync] 无法叠加参数 ${id} += ${v}`)
+    }
   }
 
   const tick = () => {
@@ -68,6 +85,11 @@ export function createLipSync(app: PIXI.Application, model: Live2DModel, opts?: 
       // additive 模式会在原有动画基础上叠加，注意不要超 1
       addParam(mouthOpenId, Math.min(1, level), 1)
     }
+    
+    // 调试输出（每 30 帧输出一次，避免刷屏）
+    if (Math.random() < 0.033) {
+      console.log(`[LipSync] ${mouthOpenId} = ${level.toFixed(3)} (${MODE})`)
+    }
 
     // 可选：根据频谱粗略调节 MouthForm（示意；如无该参数可忽略）
     // const freq = new Float32Array(analyser.frequencyBinCount)
@@ -88,18 +110,38 @@ export function createLipSync(app: PIXI.Application, model: Live2DModel, opts?: 
       const src = ac.createMediaElementSource(el)
       connect(src)
       if (!running) { app.ticker.add(tick); running = true }
-      return () => { try { src.disconnect() } catch {} }
+      nodeCleanup = () => { try { src.disconnect() } catch {} }
+      return () => nodeCleanup?.()
     },
     async fromStream(stream: MediaStream) {
       await ac.resume()
       const src = ac.createMediaStreamSource(stream)
       connect(src)
       if (!running) { app.ticker.add(tick); running = true }
-      return () => { try { src.disconnect() } catch {} }
+      nodeCleanup = () => { try { src.disconnect() } catch {} }
+      return () => nodeCleanup?.()
+    },
+    async fromTestTone(opts?: { frequency?: number; volume?: number }) {
+      await ac.resume()
+      const osc = ac.createOscillator()
+      const gain = ac.createGain()
+      osc.frequency.value = opts?.frequency ?? 220
+      gain.gain.value = opts?.volume ?? 0.15
+      osc.connect(gain)
+      connect(gain)
+      osc.start()
+      if (!running) { app.ticker.add(tick); running = true }
+      nodeCleanup = () => {
+        try { osc.stop() } catch {}
+        try { osc.disconnect() } catch {}
+        try { gain.disconnect() } catch {}
+      }
+      return () => nodeCleanup?.()
     },
     stop() {
       if (running) { app.ticker.remove(tick); running = false }
       try { analyser.disconnect() } catch {}
+      try { nodeCleanup?.() } catch {}
       try { ac.close() } catch {}
     },
   }

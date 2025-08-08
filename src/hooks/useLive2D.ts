@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import * as PIXI from 'pixi.js'
-import { Live2DModel, SoundManager, MotionPriority } from 'pixi-live2d-display'
+import { Live2DModel } from 'pixi-live2d-display/cubism4'
 
 // 确保 PIXI 在全局可用
 if (typeof window !== 'undefined') {
@@ -70,8 +70,7 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
         }
       })
 
-      // 配置 SoundManager
-      SoundManager.volume = 0.7
+  // 音量控制改由外层音频元素或业务侧管理
 
       // 标记为已初始化
       initializedRef.current = true
@@ -209,8 +208,8 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
   }, [])
 
   // 设置音量
-  const setVolume = useCallback((volume: number) => {
-    SoundManager.volume = Math.max(0, Math.min(1, volume))
+  const setVolume = useCallback((_volume: number) => {
+    // 占位：由上层音频实现负责
   }, [])
 
   // 自动调整模型位置和大小

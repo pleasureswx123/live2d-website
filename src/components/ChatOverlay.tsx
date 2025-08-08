@@ -64,7 +64,11 @@ export default function ChatOverlay({ anchor }: { anchor: {x:number,y:number} | 
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
             className="absolute max-w-[52vw]"
-            style={{ left: anchor.x, top: anchor.y }}
+            // 将气泡锚点上移，避免遮挡面部；同时限制在画布可视区域内
+            style={{
+              left: Math.max(16, Math.min(window.innerWidth - 16, anchor.x)),
+              top: Math.max(16, Math.min(window.innerHeight - 16, anchor.y - 120))
+            }}
           >
             <div className="relative -translate-x-1/2 -translate-y-full">
               <div className="pointer-events-auto rounded-2xl bg-white/85 backdrop-blur px-4 py-3 shadow-lg ring-1 ring-black/5 text-gray-900">
