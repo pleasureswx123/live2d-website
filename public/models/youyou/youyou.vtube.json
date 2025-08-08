@@ -11,25 +11,25 @@
     "ModelSaveMetadata": {
         "LastSavedVTubeStudioVersion": "1.32.3",
         "LastSavedPlatform": "Steam",
-        "LastSavedDateUTC": "Thursday, 31 July 2025, 16:54:24",
-        "LastSavedDateLocalTime": "Friday, 01 August 2025, 00:54:24",
-        "LastSavedDateUnixMillisecondTimestamp": "1753980864671"
+        "LastSavedDateUTC": "Wednesday, 30 July 2025, 19:33:13",
+        "LastSavedDateLocalTime": "Thursday, 31 July 2025, 03:33:13",
+        "LastSavedDateUnixMillisecondTimestamp": "1753903993195"
     },
     "SavedModelPosition": {
         "Position": {
-            "x": -14.101465225219727,
-            "y": -3.4562859535217287,
+            "x": 0.9808735847473145,
+            "y": -77.54660034179688,
             "z": 0.0
         },
         "Rotation": {
             "x": 0.0,
             "y": 0.0,
-            "z": 2.6624670822171524e-44,
+            "z": 0.0,
             "w": 1.0
         },
         "Scale": {
-            "x": 1.024926781654358,
-            "y": 1.024926781654358,
+            "x": 2.159126043319702,
+            "y": 2.159126043319702,
             "z": 1.0
         }
     },
@@ -58,12 +58,12 @@
         "Use": true,
         "UseLegacyPhysics": false,
         "Live2DPhysicsFPS": 3,
-        "PhysicsStrength": 62,
+        "PhysicsStrength": 50,
         "WindStrength": 0,
         "DraggingPhysicsStrength": 0
     },
     "GeneralSettings": {
-        "TimeUntilTrackingLostIdleAnimation": 10.0,
+        "TimeUntilTrackingLostIdleAnimation": 1.0,
         "WorkshopSharingForbidden": true,
         "EnableExpressionSaving": false
     },
@@ -355,6 +355,22 @@
             "OutputLive2D": "Param64",
             "Smoothing": 20,
             "Minimized": true
+        },
+        {
+            "Folder": "",
+            "Name": "呼吸",
+            "Input": "",
+            "InputRangeLower": -1.0,
+            "InputRangeUpper": 1.0,
+            "OutputRangeLower": 0.0,
+            "OutputRangeUpper": 1.0,
+            "ClampInput": false,
+            "ClampOutput": false,
+            "UseBlinking": false,
+            "UseBreathing": true,
+            "OutputLive2D": "ParamBreath",
+            "Smoothing": 20,
+            "Minimized": false
         }
     ],
     "Hotkeys": [
@@ -447,14 +463,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N2",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -557,14 +573,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Alt",
-                "Trigger2": "A",
+                "Trigger1": "",
+                "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -667,7 +683,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N1",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -777,7 +793,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N3",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -887,7 +903,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N4",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -997,7 +1013,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N5",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -1107,7 +1123,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N6",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -1217,14 +1233,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Alt",
-                "Trigger2": "S",
+                "Trigger1": "",
+                "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -1327,14 +1343,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Alt",
-                "Trigger2": "D",
+                "Trigger1": "",
+                "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -1437,14 +1453,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Alt",
-                "Trigger2": "R",
+                "Trigger1": "",
+                "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -1547,7 +1563,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N7",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -1657,7 +1673,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N8",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -1767,14 +1783,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Alt",
-                "Trigger2": "F",
+                "Trigger1": "",
+                "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -1877,14 +1893,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Numpad1",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -1987,14 +2003,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N9",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -2097,14 +2113,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "N0",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -2207,14 +2223,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Numpad2",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -2317,7 +2333,7 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Numpad3",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
@@ -2434,7 +2450,7 @@
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": true,
             "OnlyLoadOneRandomItem": false,
@@ -2537,14 +2553,14 @@
                 }
             },
             "Triggers": {
-                "Trigger1": "Numpad4",
+                "Trigger1": "",
                 "Trigger2": "",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -2648,13 +2664,13 @@
             },
             "Triggers": {
                 "Trigger1": "LeftControl",
-                "Trigger2": "Q",
+                "Trigger2": "N1",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,
@@ -2758,13 +2774,13 @@
             },
             "Triggers": {
                 "Trigger1": "LeftControl",
-                "Trigger2": "W",
+                "Trigger2": "N2",
                 "Trigger3": "",
                 "ScreenButton": -1
             },
             "IsGlobal": true,
             "IsActive": true,
-            "Minimized": false,
+            "Minimized": true,
             "StopsOnLastFrame": false,
             "DeactivateAfterKeyUp": false,
             "OnlyLoadOneRandomItem": false,

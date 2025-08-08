@@ -182,6 +182,16 @@
 			"Name": "眼Y3"
 		},
 		{
+			"Id": "Param68",
+			"GroupId": "ParamGroup8",
+			"Name": "生气符号1"
+		},
+		{
+			"Id": "Param69",
+			"GroupId": "ParamGroup8",
+			"Name": "生气符号2"
+		},
+		{
 			"Id": "ParamAngleX",
 			"GroupId": "ParamGroup",
 			"Name": "角度 X"
@@ -332,14 +342,14 @@
 			"Name": "鬼脸"
 		},
 		{
-			"Id": "Param20",
-			"GroupId": "ParamGroup5",
-			"Name": "眼泪"
-		},
-		{
 			"Id": "Param21",
 			"GroupId": "ParamGroup5",
 			"Name": "委屈"
+		},
+		{
+			"Id": "Param20",
+			"GroupId": "ParamGroup5",
+			"Name": "眼泪"
 		},
 		{
 			"Id": "Param22",
@@ -556,8 +566,12 @@
 	],
 	"Parts": [
 		{
+			"Id": "Part17",
+			"Name": "图层365.png"
+		},
+		{
 			"Id": "Part14",
-			"Name": "LIVE 2D 拆2.psd"
+			"Name": "LIVE 2D 桌子.psd"
 		},
 		{
 			"Id": "Part2",
