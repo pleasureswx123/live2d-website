@@ -1,0 +1,136 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "LIVE 2D 384.moc3",
+    "Textures": [
+      "LIVE 2D 384.4096/texture_00.png",
+      "LIVE 2D 384.4096/texture_01.png"
+    ],
+    "Physics": "LIVE 2D 384.physics3.json",
+    "DisplayInfo": "LIVE 2D 384.cdi3.json"
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": []
+    },
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    }
+  ],
+  "Motions": {
+    "Idle": [
+      {
+        "File": "sleep.motion3.json"
+      }
+    ],
+    "Custom": [
+      {
+        "File": "╗∙┤í╢»╗¡.motion3.json"
+      },
+      {
+        "File": "╗╙╩╓.motion3.json"
+      },
+      {
+        "File": "╥í═╖.motion3.json"
+      },
+      {
+        "File": "╡π═╖.motion3.json"
+      },
+      {
+        "File": "╤█╓Θ╫╙.motion3.json"
+      },
+      {
+        "File": "╦»╛⌡.motion3.json"
+      }
+    ]
+  },
+  "Expressions": [
+    {
+      "Name": "░┴╜┐.exp3",
+      "File": "░┴╜┐.exp3.json"
+    },
+    {
+      "Name": "▓µ╤ⁿ.exp3",
+      "File": "▓µ╤ⁿ.exp3.json"
+    },
+    {
+      "Name": "╣■╣■┤≤╨ª.exp3",
+      "File": "╣■╣■┤≤╨ª.exp3.json"
+    },
+    {
+      "Name": "╬»╟ⁿ.exp3",
+      "File": "╬»╟ⁿ.exp3.json"
+    },
+    {
+      "Name": "║ª╨▀.exp3",
+      "File": "║ª╨▀.exp3.json"
+    },
+    {
+      "Name": "╛¬╧▓.exp3",
+      "File": "╛¬╧▓.exp3.json"
+    },
+    {
+      "Name": "╛¬╤╚.exp3",
+      "File": "╛¬╤╚.exp3.json"
+    },
+    {
+      "Name": "═╨╚∙.exp3",
+      "File": "═╨╚∙.exp3.json"
+    },
+    {
+      "Name": "▒º╨╪.exp3",
+      "File": "▒º╨╪.exp3.json"
+    },
+    {
+      "Name": "╗╙╩╓.exp3",
+      "File": "╗╙╩╓.exp3.json"
+    },
+    {
+      "Name": "╬┬╚ß╡─╨ª.exp3",
+      "File": "╬┬╚ß╡─╨ª.exp3.json"
+    },
+    {
+      "Name": "╔·╞°.exp3",
+      "File": "╔·╞°.exp3.json"
+    },
+    {
+      "Name": "╡τ─╘.exp3",
+      "File": "╡τ─╘.exp3.json"
+    },
+    {
+      "Name": "╡τ─╘╖ó╣Γ.exp3",
+      "File": "╡τ─╘╖ó╣Γ.exp3.json"
+    },
+    {
+      "Name": "├╨├╨╤█.exp3",
+      "File": "├╨├╨╤█.exp3.json"
+    },
+    {
+      "Name": "╤█└ß.exp3",
+      "File": "╤█└ß.exp3.json"
+    },
+    {
+      "Name": "┴│║∞.exp3",
+      "File": "┴│║∞.exp3.json"
+    },
+    {
+      "Name": "┬Σ└ß.exp3",
+      "File": "┬Σ└ß.exp3.json"
+    },
+    {
+      "Name": "╝ⁿ┼╠╠º╞≡.exp3",
+      "File": "╝ⁿ┼╠╠º╞≡.exp3.json"
+    },
+    {
+      "Name": "╣φ┴│.exp3",
+      "File": "╣φ┴│.exp3.json"
+    }
+  ]
+}
