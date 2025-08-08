@@ -61,85 +61,120 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
     el.appendChild(app.view as HTMLCanvasElement)
     appRef.current = app
 
-    // 使用正确的模型加载方式
-    const model = Live2DModel.fromSync(modelUrl, {
-      autoUpdate: false, // 我们手动控制更新
-      onError: (error: any) => console.error('Live2D模型加载错误:', error)
-    })
+    // 使用异步加载确保模型完全准备好
+    const loadModelAsync = async () => {
+      try {
+        console.log('[Live2DStage] 开始异步加载模型:', modelUrl)
+        const model = await Live2DModel.from(modelUrl, {
+          autoUpdate: false, // 我们手动控制更新
+          onError: (error: any) => console.error('Live2D模型加载错误:', error)
+        })
 
-    modelRef.current = model
-    
-    // 存储模型的原始 JSON 设置
-    let modelSettings: any = null
+        modelRef.current = model
+        console.log('[Live2DStage] 模型创建成功，等待完全加载...')
 
-    // 监听设置 JSON 加载完成事件（关键！）
-    model.once('settingsJSONLoaded', (json: any) => {
-      console.log('[Live2DStage] 模型设置 JSON 已加载:', json)
-      modelSettings = json
-      // 将设置挂载到模型上，供 AnimDirector 使用
-      ;(model as any).__modelSettings = json
-    })
+        // 存储模型的原始 JSON 设置
+        let modelSettings: any = null
 
-    // 监听模型加载完成事件
-    model.once('load', () => {
-      console.log('[Live2DStage] 模型完全加载完成')
-      
-      // 检查 motionManager 状态
-      const motionManager = model.internalModel?.motionManager
-      console.log('[Live2DStage] motionManager 加载后状态:', {
-        exists: !!motionManager,
-        keys: motionManager ? Object.keys(motionManager) : [],
-        hasStartMotion: motionManager ? typeof motionManager.startMotion === 'function' : false,
-        hasStartRandomMotion: motionManager ? typeof motionManager.startRandomMotion === 'function' : false
-      })
-      
-      // 添加到舞台
-      app.stage.addChild(model)
-      const w = app.renderer.width / app.renderer.resolution
-      const h = app.renderer.height / app.renderer.resolution
-      layout(model, w, h)
+        // 等待模型完全加载
+        await new Promise<void>((resolve) => {
+          let settingsLoaded = false
+          let modelLoaded = false
 
-      // 手动更新循环
-      const updateTicker = () => {
-        if (modelRef.current) {
-          modelRef.current.update(app.ticker.deltaMS)
+          const checkComplete = () => {
+            if (settingsLoaded && modelLoaded) {
+              console.log('[Live2DStage] 模型和设置都已加载完成')
+              resolve()
+            }
+          }
+
+          // 监听设置 JSON 加载完成事件
+          model.once('settingsJSONLoaded', (json: any) => {
+            console.log('[Live2DStage] 模型设置 JSON 已加载:', json)
+            modelSettings = json
+            ;(model as any).__modelSettings = json
+            settingsLoaded = true
+            checkComplete()
+          })
+
+          // 监听模型加载完成事件
+          model.once('load', () => {
+            console.log('[Live2DStage] 模型完全加载完成')
+            modelLoaded = true
+            checkComplete()
+          })
+
+          // 如果已经加载完成，直接resolve
+          if (model.internalModel && model.internalModel.motionManager) {
+            console.log('[Live2DStage] 模型已经完全初始化')
+            settingsLoaded = true
+            modelLoaded = true
+            checkComplete()
+          }
+        })
+
+        // 检查 motionManager 状态
+        const motionManager = model.internalModel?.motionManager
+        console.log('[Live2DStage] motionManager 最终状态:', {
+          exists: !!motionManager,
+          keys: motionManager ? Object.keys(motionManager) : [],
+          hasStartMotion: motionManager ? typeof motionManager.startMotion === 'function' : false,
+          hasMotion: typeof model.motion === 'function',
+          internalModel: !!model.internalModel
+        })
+
+        // 添加到舞台
+        app.stage.addChild(model)
+        const w = app.renderer.width / app.renderer.resolution
+        const h = app.renderer.height / app.renderer.resolution
+        layout(model, w, h)
+
+        // 手动更新循环
+        const updateTicker = () => {
+          if (modelRef.current) {
+            modelRef.current.update(app.ticker.deltaMS)
+          }
         }
+        app.ticker.add(updateTicker)
+
+        // 创建动画导演和口型同步（确保模型已完全加载）
+        const baseDir = new URL(modelUrl, window.location.href).href.replace(/\/[^\/]*$/, '/')
+        console.log('[Live2DStage] 创建动画导演，baseDir:', baseDir)
+
+        const director = createAnimDirector(app, model, { baseDir, modelSettings })
+        const lipSync = createLipSync(app, model, {
+          fftSize: 512,
+          threshold: 0.005, // 降低噪声门限
+          gain: 20, // 增加增益
+          attackMs: 50, // 更快的攻击时间
+          releaseMs: 200, // 更慢的释放时间
+          mode: 'override'
+        })
+
+        // 将实例挂载到模型上，方便外部访问
+        ;(model as any).__director = director
+        ;(model as any).__lipSync = lipSync
+
+        // 将实例挂载到全局，方便其他组件访问
+        ;(window as any).__live2d = {
+          model: model,
+          app: app
+        }
+
+        // 初次锚点
+        sendAnchor()
+
+        // 通知外部模型已准备就绪
+        onReady?.(model, app)
+
+        console.log('[Live2DStage] 模型完全初始化完成')
+      } catch (error) {
+        console.error('[Live2DStage] 模型加载失败:', error)
       }
-      app.ticker.add(updateTicker)
+    }
 
-      // 创建动画导演和口型同步（确保设置已加载）
-      const baseDir = new URL(modelUrl, window.location.href).href
-      const director = createAnimDirector(app, model, { baseDir, modelSettings })
-      const lipSync = createLipSync(app, model, {
-        fftSize: 512,
-        threshold: 0.005, // 降低噪声门限
-        gain: 20, // 增加增益
-        attackMs: 50, // 更快的攻击时间
-        releaseMs: 200, // 更慢的释放时间
-        mode: 'override'
-      })
-
-      // 将实例挂载到模型上，方便外部访问
-      ;(model as any).__director = director
-      ;(model as any).__lipSync = lipSync
-
-      // 将实例挂载到全局，方便其他组件访问
-      ;(window as any).__live2d = {
-        model: model,
-        app: app
-      }
-
-      // 初次锚点
-      sendAnchor()
-
-      // 通知外部模型已准备就绪
-      onReady?.(model, app)
-    })
-
-    // 监听就绪事件（基础资源加载完成）
-    model.once('ready', () => {
-      console.log('[Live2DStage] 模型基础资源就绪')
-    })
+    // 启动异步加载
+    loadModelAsync()
 
     function sendAnchor() {
       if (!onAnchor || !modelRef.current) return

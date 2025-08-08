@@ -67,8 +67,28 @@ export function createAnimDirector(
   
   function getMotionDefs() {
     const settings = getSettings()
-    if (!settings) return {}
-    return settings.Motions || settings.motions || {}
+    if (settings && (settings.Motions || settings.motions)) {
+      return settings.Motions || settings.motions || {}
+    }
+
+    // 如果无法获取设置，使用硬编码的动作定义（基于youyou.model3.json）
+    // 注意：使用与模型配置文件完全一致的大写组名
+    console.log('[AnimDirector] 使用硬编码的动作定义')
+    return {
+      "Idle": [
+        { "File": "sleep.motion3.json" },
+        { "File": "jichudonghua.motion3.json" }
+      ],
+      "TapBody": [
+        { "File": "huishou.motion3.json" },
+        { "File": "diantou.motion3.json" },
+        { "File": "yaotou.motion3.json" }
+      ],
+      "TapHead": [
+        { "File": "yanzhuzi.motion3.json" },
+        { "File": "shuijiao.motion3.json" }
+      ]
+    }
   }
   
   function getExprDefs() {
@@ -286,321 +306,133 @@ export function createAnimDirector(
 
   async function play(group: string, index = 0, priority = 2) {
     console.log(`[AnimDirector] 播放动作: ${group}[${index}] 优先级=${priority}`)
-    
+
+    // 使用与直接测试相同的全局模型引用
+    const live2d = (window as any).__live2d
+    if (!live2d?.model) {
+      console.error(`[AnimDirector] 无法获取全局模型引用`)
+      return false
+    }
+
+    const globalModel = live2d.model
+    console.log(`[AnimDirector] 使用全局模型引用进行动作播放`)
+
     // 检查模型是否准备好
-    if (!anyModel.internalModel) {
+    if (!globalModel.internalModel) {
       console.error(`[AnimDirector] 模型内部结构未准备好`)
       return false
     }
-    
+
     // 获取动作定义
     const motionDefs = getMotionDefs()
     console.log(`[AnimDirector] 可用动作组:`, Object.keys(motionDefs))
-    
+
     if (!motionDefs[group] || motionDefs[group].length === 0) {
       console.error(`[AnimDirector] 动作组不存在: ${group}, 可用组:`, Object.keys(motionDefs))
       return false
     }
-    
+
     if (index >= motionDefs[group].length) {
       console.error(`[AnimDirector] 动作索引超出范围: ${group}[${index}], 最大索引: ${motionDefs[group].length - 1}`)
       return false
     }
+
+    // 方法1: 使用模型内置的motionManager（最可靠的方法）
+    if (globalModel.motionManager && typeof globalModel.motionManager.startMotion === 'function') {
+      console.log(`[AnimDirector] 使用 motionManager.startMotion API`)
+
+      try {
+        // 使用motionManager的startMotion方法
+        // 参数：(group, index, priority)
+        const result = globalModel.motionManager.startMotion(group, index, priority)
+        console.log(`[AnimDirector] motionManager.startMotion('${group}', ${index}, ${priority}) 结果:`, result)
+
+        if (result !== null && result !== false) {
+          console.log(`[AnimDirector] 动作播放成功 - 使用motionManager`)
+          return true
+        }
+
+        // 如果指定索引失败，尝试索引0
+        if (index > 0) {
+          const backupResult = globalModel.motionManager.startMotion(group, 0, priority)
+          console.log(`[AnimDirector] motionManager.startMotion('${group}', 0, ${priority}) 备用结果:`, backupResult)
+
+          if (backupResult !== null && backupResult !== false) {
+            console.log(`[AnimDirector] 动作播放成功 - 使用motionManager备用索引`)
+            return true
+          }
+        }
+
+      } catch (error) {
+        console.warn(`[AnimDirector] motionManager.startMotion 失败:`, error)
+      }
+    }
+
+    // 方法2: 使用标准的 model.motion API
+    if (typeof globalModel.motion === 'function') {
+      console.log(`[AnimDirector] 使用 model.motion API`)
+      try {
+        // 根据官方文档，model.motion() 调用后立即开始播放动作
+        // 不需要检查Promise返回值，API调用成功即表示动作开始播放
+        const result = globalModel.motion(group, index)
+        console.log(`[AnimDirector] model.motion('${group}', ${index}) 调用成功`)
+
+        // API调用成功，动作应该已经开始播放
+        console.log(`[AnimDirector] 动作播放成功 - API调用完成`)
+        return true
+
+      } catch (error) {
+        console.warn(`[AnimDirector] model.motion API 调用失败:`, error)
+
+        // 如果指定索引失败，尝试索引0（第一个动作）
+        if (index > 0) {
+          try {
+            const result = globalModel.motion(group, 0)
+            console.log(`[AnimDirector] model.motion('${group}', 0) 备用调用成功`)
+            console.log(`[AnimDirector] 动作播放成功 - 使用备用索引`)
+            return true
+          } catch (backupError) {
+            console.warn(`[AnimDirector] 备用索引也失败:`, backupError)
+          }
+        }
+
+        // 尝试随机播放该组（不指定索引）
+        try {
+          const result = globalModel.motion(group)
+          console.log(`[AnimDirector] model.motion('${group}') 随机播放调用成功`)
+          console.log(`[AnimDirector] 动作播放成功 - 随机播放`)
+          return true
+        } catch (randomError) {
+          console.warn(`[AnimDirector] 随机播放也失败:`, randomError)
+        }
+      }
+    }
     
     console.log(`[AnimDirector] 准备播放动作文件: ${motionDefs[group][index].File}`)
 
-    // 方法1: 使用正确的 Live2D API
-    console.log(`[AnimDirector] 尝试 Live2D 官方 API`)
-    
-    // 检查模型是否有 internalModel
-    if (!anyModel.internalModel) {
-      console.error(`[AnimDirector] internalModel 不存在`)
-      return false
-    }
-    
-    // 方法1a: 尝试使用 Live2D 的官方 startMotion API
-    try {
-      console.log(`[AnimDirector] 尝试官方 startMotion API`)
-      
-      // Live2D Cubism 4 的正确调用方式是直接在 internalModel 上调用
-      const internalModel = anyModel.internalModel
-      if (internalModel && typeof internalModel.startMotion === 'function') {
-        console.log(`[AnimDirector] 使用 internalModel.startMotion`)
-        let result = await internalModel.startMotion(group, index, 3) // FORCE priority
+    // 方法2: 尝试使用 internalModel.startMotion API（备用方法）
+    const internalModel = anyModel.internalModel
+    if (internalModel && typeof internalModel.startMotion === 'function') {
+      console.log(`[AnimDirector] 使用 internalModel.startMotion`)
+      try {
+        let result = await internalModel.startMotion(group, index, priority)
         console.log(`[AnimDirector] internalModel.startMotion 结果:`, result)
-        if (result && result !== false) return result
-        
-        // 尝试不同优先级
-        result = await internalModel.startMotion(group, index, 2) // NORMAL priority
-        console.log(`[AnimDirector] internalModel.startMotion(NORMAL) 结果:`, result)
-        if (result && result !== false) return result
-      }
-    } catch (e) {
-      console.warn(`[AnimDirector] internalModel.startMotion 失败:`, e)
-    }
-    
-    // 方法1b: 尝试高级 model.motion API
-    if (typeof anyModel.motion === 'function') {
-      console.log(`[AnimDirector] 尝试 model.motion API`)
-      try {
-        let result = await anyModel.motion(group, index)
-        console.log(`[AnimDirector] model.motion(${group}, ${index}) 结果:`, result)
-        if (result && result !== false) return result
-        
-        // 尝试随机播放
-        result = await anyModel.motion(group)
-        console.log(`[AnimDirector] model.motion(${group}) 随机结果:`, result)
-        if (result && result !== false) return result
-      } catch (e) {
-        console.warn(`[AnimDirector] model.motion API 失败:`, e)
+        if (result !== false && result !== null && result !== undefined) {
+          console.log(`[AnimDirector] 动作播放成功`)
+          return true
+        }
+      } catch (error) {
+        console.warn(`[AnimDirector] internalModel.startMotion 失败:`, error)
       }
     }
 
-    // 方法2: 获取 motionManager 并尝试播放
-    const motionManager = anyModel.internalModel.motionManager
-    if (motionManager) {
-      console.log(`[AnimDirector] motionManager 详细状态:`, {
-        hasStartMotion: typeof motionManager.startMotion === 'function',
-        hasStartRandomMotion: typeof motionManager.startRandomMotion === 'function',
-        hasStartMotionByPriority: typeof motionManager.startMotionByPriority === 'function',
-        motionManagerKeys: Object.keys(motionManager),
-        allMethods: Object.keys(motionManager).filter(k => typeof motionManager[k] === 'function'),
-        definitions: motionManager.definitions ? 'exists' : 'missing',
-        _definitions: motionManager._definitions ? 'exists' : 'missing',
-        queueManager: motionManager.queueManager ? 'exists' : 'missing',
-        state: motionManager.state || 'unknown',
-        isInitialized: motionManager.isInitialized || false,
-        motionQueueManager: motionManager.motionQueueManager ? 'exists' : 'missing'
-      })
-      
-      // 检查 motionManager 是否已经初始化
-      if (motionManager.state === 'uninitialized' || !motionManager.isInitialized) {
-        console.warn(`[AnimDirector] motionManager 未初始化，尝试初始化...`)
-        try {
-          if (typeof motionManager.initialize === 'function') {
-            motionManager.initialize()
-          }
-        } catch (e) {
-          console.warn(`[AnimDirector] motionManager 初始化失败:`, e)
-        }
-      }
-
-      // 尝试不同的 startMotion 方法
-      if (typeof motionManager.startMotion === 'function') {
-        console.log(`[AnimDirector] 使用 motionManager.startMotion`)
-        try {
-          // Live2D Cubism 4 的 startMotion 通常需要文件路径而不是索引
-          const motionFile = motionDefs[group][index].File
-          debugger
-          const motionPath = `${opts.baseDir}${motionFile}`
-          
-          console.log(`[AnimDirector] 尝试使用文件路径: ${motionPath}`)
-          let result = motionManager.startMotion(group, index, priority)
-          console.log(`[AnimDirector] startMotion(${group}, ${index}, ${priority}) 结果:`, result)
-          
-          // 等待Promise完成（如果是Promise）
-          if (result && typeof result.then === 'function') {
-            result = await result
-            console.log(`[AnimDirector] startMotion Promise 结果:`, result)
-          }
-          
-          if (result && result !== false) return result
-
-          // 尝试不同的优先级
-          console.log(`[AnimDirector] 尝试优先级 2 (NORMAL)`)
-          result = motionManager.startMotion(group, index, 2)
-          console.log(`[AnimDirector] startMotion 优先级2 结果:`, result)
-          
-          if (result && typeof result.then === 'function') {
-            result = await result
-          }
-          if (result && result !== false) return result
-
-          // 尝试优先级 1 (IDLE)
-          console.log(`[AnimDirector] 尝试优先级 1 (IDLE)`)
-          result = motionManager.startMotion(group, index, 1)
-          console.log(`[AnimDirector] startMotion 优先级1 结果:`, result)
-          
-          if (result && typeof result.then === 'function') {
-            result = await result
-          }
-          if (result && result !== false) return result
-          
-        } catch (e) {
-          console.warn(`[AnimDirector] motionManager.startMotion 失败:`, e)
-        }
-      }
-
-      // 尝试使用 startMotionByPriority
-      if (typeof motionManager.startMotionByPriority === 'function') {
-        console.log(`[AnimDirector] 使用 motionManager.startMotionByPriority`)
-        try {
-          const result = motionManager.startMotionByPriority(group, index, priority)
-          console.log(`[AnimDirector] startMotionByPriority 结果:`, result)
-          if (result) return result
-        } catch (e) {
-          console.warn(`[AnimDirector] motionManager.startMotionByPriority 失败:`, e)
-        }
-      }
-      
-      // 尝试随机播放该组动作
-      if (typeof motionManager.startRandomMotion === 'function') {
-        console.log(`[AnimDirector] 使用 motionManager.startRandomMotion`)
-        try {
-          const result = motionManager.startRandomMotion(group, priority)
-          console.log(`[AnimDirector] startRandomMotion 结果:`, result)
-          if (result) return result
-        } catch (e) {
-          console.warn(`[AnimDirector] motionManager.startRandomMotion 失败:`, e)
-        }
-      }
-    }
-
-    // 方法4: 尝试直接文件路径方法
-    if (motionManager) {
-      console.log(`[AnimDirector] 尝试直接文件路径方法`)
-      try {
-        const motionFile = motionDefs[group][index].File
-        const fullPath = `${opts.baseDir}${motionFile}`
-        
-        console.log(`[AnimDirector] 动作文件完整路径: ${fullPath}`)
-        
-        // 方法4a: 尝试用文件路径直接调用
-        if (typeof motionManager.startMotion === 'function') {
-          console.log(`[AnimDirector] 尝试 startMotion 使用文件路径`)
-          let result = motionManager.startMotion(fullPath, priority)
-          console.log(`[AnimDirector] startMotion(文件路径) 结果:`, result)
-          if (result && result !== false) return result
-        }
-        
-        // 方法4b: 检查是否存在 Cubism 4 的其他方法
-        const cubismMethods = [
-          'startMotionPriority',
-          'reserveMotion', 
-          'setMotion',
-          'playMotion',
-          'loadMotion'
-        ]
-        
-        for (const methodName of cubismMethods) {
-          if (typeof motionManager[methodName] === 'function') {
-            console.log(`[AnimDirector] 尝试使用 ${methodName}`)
-            try {
-              let result = motionManager[methodName](group, index, priority)
-              console.log(`[AnimDirector] ${methodName}(${group}, ${index}, ${priority}) 结果:`, result)
-              if (result && typeof result.then === 'function') {
-                result = await result
-              }
-              if (result && result !== false) return result
-              
-              // 也尝试文件路径
-              result = motionManager[methodName](fullPath, priority)
-              console.log(`[AnimDirector] ${methodName}(文件路径) 结果:`, result)
-              if (result && typeof result.then === 'function') {
-                result = await result
-              }
-              if (result && result !== false) return result
-            } catch (e) {
-              console.warn(`[AnimDirector] ${methodName} 调用失败:`, e)
-            }
-          }
-        }
-        
-        // 方法5: 使用 motionQueueManager (关键!)
-        const motionQueueManager = anyModel.internalModel.motionQueueManager
-        if (motionQueueManager) {
-          console.log(`[AnimDirector] 找到 motionQueueManager，尝试直接调用`)
-          try {
-            // 这是 Live2D Cubism 4 的正确方式
-            if (typeof motionQueueManager.startMotion === 'function') {
-              console.log(`[AnimDirector] 使用 motionQueueManager.startMotion`)
-              let result = motionQueueManager.startMotion(group, index, 3) // FORCE
-              console.log(`[AnimDirector] motionQueueManager.startMotion 结果:`, result)
-              if (result && result !== false) return result
-              
-              // 尝试其他优先级
-              result = motionQueueManager.startMotion(group, index, 2) // NORMAL
-              console.log(`[AnimDirector] motionQueueManager.startMotion(NORMAL) 结果:`, result)
-              if (result && result !== false) return result
-            }
-            
-            // 尝试其他可能的方法
-            const queueMethods = ['startMotionByPriority', 'reserveMotion', 'setMotion']
-            for (const method of queueMethods) {
-              if (typeof motionQueueManager[method] === 'function') {
-                console.log(`[AnimDirector] 尝试 motionQueueManager.${method}`)
-                let result = motionQueueManager[method](group, index, 3)
-                console.log(`[AnimDirector] motionQueueManager.${method} 结果:`, result)
-                if (result && result !== false) return result
-              }
-            }
-          } catch (e) {
-            console.warn(`[AnimDirector] motionQueueManager 调用失败:`, e)
-          }
-        }
-        
-        // 尝试直接使用内部API
-        if (motionManager._definitions || motionManager.definitions) {
-          const definitions = motionManager._definitions || motionManager.definitions
-          const motionGroup = definitions.motions?.[group] || definitions[group]
-          if (motionGroup && motionGroup[index]) {
-            console.log(`[AnimDirector] 找到动作定义:`, motionGroup[index])
-            
-            // 尝试直接调用内部方法
-            if (typeof motionManager._startMotion === 'function') {
-              const result = motionManager._startMotion(group, index, priority)
-              console.log(`[AnimDirector] _startMotion 结果:`, result)
-              if (result) return result
-            }
-            
-            // 尝试使用队列管理器
-            if (motionManager.queueManager && typeof motionManager.queueManager.startMotion === 'function') {
-              const result = motionManager.queueManager.startMotion(group, index, priority)
-              console.log(`[AnimDirector] queueManager.startMotion 结果:`, result)
-              if (result) return result
-            }
-          }
-        }
-      } catch (e) {
-        console.warn(`[AnimDirector] Cubism 4 方法调用失败:`, e)
-      }
-    }
-
-    // 最后的回退方法: 尝试 Live2D SDK 的原始方式
-    console.log(`[AnimDirector] 尝试最后的回退方法`)
-    try {
-      // 检查是否有 Live2D 的全局对象
-      const Live2D = (window as any).Live2D
-      if (Live2D) {
-        console.log(`[AnimDirector] 找到 Live2D 全局对象`)
-        // 这里可以尝试使用 Live2D SDK 的原始 API
-      }
-      
-      // 尝试直接操作模型的核心组件
-      const coreModel = anyModel.internalModel?.coreModel
-      if (coreModel) {
-        console.log(`[AnimDirector] 尝试使用 coreModel`)
-        // 这是最底层的方法，直接操作模型参数
-        // 但这需要手动解析动作文件并应用参数变化
-      }
-      
-      // 最后尝试：强制触发模型更新
-      console.log(`[AnimDirector] 尝试强制模型更新`)
-      if (typeof anyModel.update === 'function') {
-        anyModel.update(16) // 强制更新一帧
-      }
-      
-    } catch (e) {
-      console.warn(`[AnimDirector] 最后回退方法失败:`, e)
-    }
-
+    // 如果所有方法都失败，记录错误信息
     console.error(`[AnimDirector] 所有动作播放方法都失败了`)
     console.error(`[AnimDirector] 请检查:`)
     console.error(`1. 动作文件是否存在: ${motionDefs[group][index].File}`)
     console.error(`2. 模型是否完全加载`)
-    console.error(`3. motionManager 是否正确初始化`)
-    console.error(`4. Live2D 版本是否兼容`)
-    
+    console.error(`3. Live2D 版本是否兼容`)
+
     return false
   }
 
