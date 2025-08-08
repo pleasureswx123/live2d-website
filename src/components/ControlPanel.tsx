@@ -38,20 +38,24 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
     { id: 'guilian', name: '鬼脸' }
   ]
 
-  // 可用的动作列表 - 使用模型文件中的实际组名和动作
+  // 可用的动作列表 - 与youyou.model3.json中的Motions完全匹配
   const motions = [
+    // Idle 组动作
+    { id: 'sleep', name: '睡眠', group: 'Idle', index: 0 },
+    { id: 'jichudonghua', name: '基础动画', group: 'Idle', index: 1 },
+    
+    // TapBody 组动作
     { id: 'huishou_motion', name: '挥手', group: 'TapBody', index: 0 },
     { id: 'diantou', name: '点头', group: 'TapBody', index: 1 },
     { id: 'yaotou', name: '摇头', group: 'TapBody', index: 2 },
+    
+    // TapHead 组动作
     { id: 'yanzhuzi', name: '眼珠子', group: 'TapHead', index: 0 },
-    { id: 'shuijiao', name: '睡觉', group: 'TapHead', index: 1 },
-    { id: 'sleep', name: '睡眠', group: 'Idle', index: 0 },
-    { id: 'jichudonghua', name: '基础动画', group: 'Idle', index: 1 }
+    { id: 'shuijiao', name: '睡觉', group: 'TapHead', index: 1 }
   ]
 
   // 播放表情
   const handlePlayExpression = () => {
-    debugger
     if (!selectedExpression) return
     console.log(`[ControlPanel] 请求播放表情: ${selectedExpression}`)
     
@@ -73,7 +77,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
 
   // 播放动作
   const handlePlayMotion = () => {
-    debugger
     if (!selectedMotion) return
     console.log(`[ControlPanel] 请求播放动作: ${selectedMotion}`)
     
@@ -170,6 +173,121 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
     const el: HTMLAudioElement | undefined = (window as any).__live2dTestAudio
     if (el) el.volume = Math.max(0, Math.min(1, newVolume / 100))
     console.log(`设置音量: ${newVolume}%`)
+  }
+
+  // 测试动作播放的专门函数
+  const handleTestMotionDirect = async () => {
+    const live2d = (window as any).__live2d
+    if (!live2d?.model) {
+      alert('Live2D 模型未加载')
+      return
+    }
+
+    const model = live2d.model
+    console.log('[Test] 开始直接测试动作播放')
+    
+    try {
+      // 测试1: 直接调用 internalModel.startMotion
+      const internalModel = model.internalModel
+      if (internalModel && typeof internalModel.startMotion === 'function') {
+        console.log('[Test] 测试 internalModel.startMotion')
+        const result = await internalModel.startMotion('TapBody', 1, 3)
+        console.log('[Test] internalModel.startMotion 结果:', result)
+        if (result) {
+          alert('成功！使用 internalModel.startMotion')
+          return
+        }
+      }
+      
+      // 测试2: 尝试 motionQueueManager
+      const motionQueueManager = internalModel?.motionQueueManager
+      if (motionQueueManager && typeof motionQueueManager.startMotion === 'function') {
+        console.log('[Test] 测试 motionQueueManager.startMotion')
+        const result = motionQueueManager.startMotion('TapBody', 1, 3)
+        console.log('[Test] motionQueueManager.startMotion 结果:', result)
+        if (result) {
+          alert('成功！使用 motionQueueManager.startMotion')
+          return
+        }
+      }
+      
+      // 测试3: 尝试高级API
+      if (typeof model.motion === 'function') {
+        console.log('[Test] 测试 model.motion')
+        const result = await model.motion('TapBody', 1)
+        console.log('[Test] model.motion 结果:', result)
+        if (result) {
+          alert('成功！使用 model.motion')
+          return
+        }
+      }
+      
+      alert('所有测试都失败了，请查看控制台日志')
+      
+    } catch (error) {
+      console.error('[Test] 测试过程中出错:', error)
+      alert('测试出错: ' + (error instanceof Error ? error.message : String(error)))
+    }
+  }
+
+  // 调试助手 - 检查Live2D状态
+  const handleDebugLive2D = () => {
+    const live2d = (window as any).__live2d
+    if (!live2d?.model) {
+      console.error('[Debug] Live2D 模型未加载')
+      alert('Live2D 模型未加载')
+      return
+    }
+
+    const model = live2d.model
+    const director = model.__director
+    
+    // 获取详细的调试信息
+    const motionManager = model.internalModel?.motionManager
+    const settings = director ? (typeof director.getSettings === 'function' ? director.getSettings() : null) : null
+    const motionDefs = director ? (typeof director.getMotionDefs === 'function' ? director.getMotionDefs() : {}) : {}
+    const exprDefs = director ? (typeof director.getExprDefs === 'function' ? director.getExprDefs() : []) : []
+    
+    console.log('[Debug] Live2D 完整状态检查:', {
+      hasModel: !!model,
+      hasDirector: !!director,
+      modelKeys: Object.keys(model),
+      internalModel: model.internalModel ? Object.keys(model.internalModel) : null,
+      motionManager: motionManager ? {
+        keys: Object.keys(motionManager),
+        methods: Object.keys(motionManager).filter(k => typeof motionManager[k] === 'function'),
+        hasStartMotion: typeof motionManager.startMotion === 'function',
+        hasStartRandomMotion: typeof motionManager.startRandomMotion === 'function',
+        hasStartMotionByPriority: typeof motionManager.startMotionByPriority === 'function',
+        hasStartMotionPriority: typeof motionManager.startMotionPriority === 'function',
+        hasReserveMotion: typeof motionManager.reserveMotion === 'function',
+        hasSetMotion: typeof motionManager.setMotion === 'function',
+        hasPlayMotion: typeof motionManager.playMotion === 'function',
+        definitions: motionManager.definitions ? 'exists' : 'missing',
+        _definitions: motionManager._definitions ? 'exists' : 'missing',
+        queueManager: motionManager.queueManager ? 'exists' : 'missing'
+      } : null,
+      settings: settings,
+      motionDefs: motionDefs,
+      expressionDefs: exprDefs,
+      availableMotions: Object.keys(motionDefs),
+      availableExpressions: exprDefs.map((e: any) => e.Name || e.name || e)
+    })
+
+    // 显示简化的调试信息
+    const debugInfo = `
+Live2D 调试信息:
+- 模型已加载: ${!!model}
+- 动画导演: ${!!director}
+- 动作管理器: ${!!motionManager}
+- 可用动作组: ${Object.keys(motionDefs).join(', ') || '无'}
+- 可用表情数: ${exprDefs.length}
+- motionManager方法: ${motionManager ? Object.keys(motionManager).filter(k => typeof motionManager[k] === 'function').join(', ') : '无'}
+
+详细信息请查看控制台日志。
+    `
+    
+    alert(debugInfo.trim())
   }
 
   if (!isOpen) return null
@@ -295,6 +413,25 @@ const ControlPanel: React.FC<ControlPanelProps> = ({ isOpen, onClose }) => {
             <p>版本: Cubism 4.0</p>
             <p>表情数量: {expressions.length}</p>
             <p>动作数量: {motions.length}</p>
+          </div>
+        </div>
+
+        {/* 调试工具 */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-cyan-300 mb-3">调试工具</h3>
+          <div className="space-y-2">
+            <button
+              onClick={handleDebugLive2D}
+              className="w-full bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded transition-colors text-sm"
+            >
+              🔍 检查Live2D状态
+            </button>
+            <button
+              onClick={handleTestMotionDirect}
+              className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors text-sm"
+            >
+              🧪 直接测试动作播放
+            </button>
           </div>
         </div>
       </div>

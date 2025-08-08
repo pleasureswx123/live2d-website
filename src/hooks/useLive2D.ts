@@ -169,11 +169,22 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
     }
 
     try {
-      console.log(`播放动作: 组=${group}, 索引=${index}`)
-      // 使用正确的API调用方式
-      await modelRef.current.motion(group, index)
+      console.log(`[useLive2D] 播放动作: 组=${group}, 索引=${index}`)
+      
+      // 检查是否有动画导演
+      const director = (modelRef.current as any).__director
+      if (director && typeof director.playMotion === 'function') {
+        console.log(`[useLive2D] 使用动画导演播放动作`)
+        await director.playMotion(group, { index, priority: 3 })
+        return
+      }
+      
+      // 回退到直接调用模型API
+      console.log(`[useLive2D] 直接调用模型API播放动作`)
+      const result = await modelRef.current.motion(group, index, 3)
+      console.log(`[useLive2D] 模型API调用结果:`, result)
     } catch (error) {
-      console.error('播放动作失败:', error)
+      console.error('[useLive2D] 播放动作失败:', error)
     }
   }, [])
 
@@ -201,7 +212,7 @@ export function useLive2D(canvasRef: React.RefObject<HTMLCanvasElement>) {
 
     try {
       console.log('重置表情')
-      modelRef.current.expression(null)
+      modelRef.current.expression(undefined)
     } catch (error) {
       console.error('重置表情失败:', error)
     }

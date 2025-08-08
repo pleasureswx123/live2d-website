@@ -4,6 +4,11 @@ import { Live2DModel } from 'pixi-live2d-display/cubism4'
 import { createLipSync } from '../lib/lipSync'
 import { createAnimDirector } from '../lib/animDirector'
 
+// 确保 PIXI 全局可用（关键！）
+if (typeof window !== 'undefined') {
+  (window as any).PIXI = PIXI
+}
+
 type Props = {
   modelUrl: string
   onAnchor?: (pt: {x: number, y: number}) => void
@@ -17,9 +22,9 @@ function clampDPR(max: number) {
 
 function layout(model: Live2DModel, w: number, h: number) {
   // 使用原始逻辑尺寸（避免因上一次缩放导致测量漂移）
-  const anyModel: any = model as any
-  const logicalW = anyModel.width ?? 1
-  const logicalH = anyModel.height ?? 1
+  const bounds = model.getBounds()
+  const logicalW = bounds.width || 1
+  const logicalH = bounds.height || 1
 
   // 留边，按短边适配
   const scaleX = (w * 0.82) / logicalW
@@ -56,45 +61,71 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
     el.appendChild(app.view as HTMLCanvasElement)
     appRef.current = app
 
-    Live2DModel.from(modelUrl).then((m) => {
-      modelRef.current = m
+    // 使用正确的模型加载方式
+    const model = Live2DModel.fromSync(modelUrl, {
+      autoUpdate: false, // 我们手动控制更新
+      onError: (error: any) => console.error('Live2D模型加载错误:', error)
+    })
 
-      // 正确注册 Ticker（Cubism4 需要手动调用）
-      if (typeof (m as any).registerTicker === 'function') {
-        (m as any).registerTicker(app.ticker)
-      }
+    modelRef.current = model
+    
+    // 存储模型的原始 JSON 设置
+    let modelSettings: any = null
 
-      // 添加模型更新循环（关键！）
-      app.ticker.add(() => {
+    // 监听设置 JSON 加载完成事件（关键！）
+    model.once('settingsJSONLoaded', (json: any) => {
+      console.log('[Live2DStage] 模型设置 JSON 已加载:', json)
+      modelSettings = json
+      // 将设置挂载到模型上，供 AnimDirector 使用
+      ;(model as any).__modelSettings = json
+    })
+
+    // 监听模型加载完成事件
+    model.once('load', () => {
+      console.log('[Live2DStage] 模型完全加载完成')
+      
+      // 检查 motionManager 状态
+      const motionManager = model.internalModel?.motionManager
+      console.log('[Live2DStage] motionManager 加载后状态:', {
+        exists: !!motionManager,
+        keys: motionManager ? Object.keys(motionManager) : [],
+        hasStartMotion: motionManager ? typeof motionManager.startMotion === 'function' : false,
+        hasStartRandomMotion: motionManager ? typeof motionManager.startRandomMotion === 'function' : false
+      })
+      
+      // 添加到舞台
+      app.stage.addChild(model)
+      const w = app.renderer.width / app.renderer.resolution
+      const h = app.renderer.height / app.renderer.resolution
+      layout(model, w, h)
+
+      // 手动更新循环
+      const updateTicker = () => {
         if (modelRef.current) {
           modelRef.current.update(app.ticker.deltaMS)
         }
-      })
+      }
+      app.ticker.add(updateTicker)
 
-      app.stage.addChild(m)
-      const w = app.renderer.width / app.renderer.resolution
-      const h = app.renderer.height / app.renderer.resolution
-      layout(m, w, h)
-
-      // 创建动画导演和口型同步
+      // 创建动画导演和口型同步（确保设置已加载）
       const baseDir = new URL(modelUrl, window.location.href).href
-      const director = createAnimDirector(app, m, { baseDir })
-      const lipSync = createLipSync(app, m, {
+      const director = createAnimDirector(app, model, { baseDir, modelSettings })
+      const lipSync = createLipSync(app, model, {
         fftSize: 512,
-        threshold: 0.02,
-        gain: 14,
-        attackMs: 60,
-        releaseMs: 120,
+        threshold: 0.005, // 降低噪声门限
+        gain: 20, // 增加增益
+        attackMs: 50, // 更快的攻击时间
+        releaseMs: 200, // 更慢的释放时间
         mode: 'override'
       })
 
       // 将实例挂载到模型上，方便外部访问
-      ;(m as any).__director = director
-      ;(m as any).__lipSync = lipSync
+      ;(model as any).__director = director
+      ;(model as any).__lipSync = lipSync
 
       // 将实例挂载到全局，方便其他组件访问
       ;(window as any).__live2d = {
-        model: m,
+        model: model,
         app: app
       }
 
@@ -102,9 +133,12 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
       sendAnchor()
 
       // 通知外部模型已准备就绪
-      onReady?.(m, app)
-    }).catch((error) => {
-      console.error('Live2D模型加载失败:', error)
+      onReady?.(model, app)
+    })
+
+    // 监听就绪事件（基础资源加载完成）
+    model.once('ready', () => {
+      console.log('[Live2DStage] 模型基础资源就绪')
     })
 
     function sendAnchor() {
@@ -121,13 +155,14 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
     }
 
     // 低频（~10Hz）刷新一次锚点，防止模型轻微动作导致偏移
-    app.ticker.add(() => {
+    const anchorTicker = () => {
       anchorTimer.current += app.ticker.deltaMS
       if (anchorTimer.current >= 100) { // 100ms
         anchorTimer.current = 0
         sendAnchor()
       }
-    })
+    }
+    app.ticker.add(anchorTicker)
 
     let resizeQueued = false
     const ro = new ResizeObserver(() => {
@@ -139,8 +174,8 @@ export default function Live2DStage({ modelUrl, onAnchor, onReady }: Props) {
         const w = el.clientWidth
         const h = el.clientHeight
         // 仅当尺寸变化时再触发 renderer.resize
-        const view = app.view as HTMLCanvasElement
-        const needResize = view.width !== Math.floor(w * app.renderer.resolution) || view.height !== Math.floor(h * app.renderer.resolution)
+        const canvas = app.view as HTMLCanvasElement
+        const needResize = canvas.width !== Math.floor(w * app.renderer.resolution) || canvas.height !== Math.floor(h * app.renderer.resolution)
         if (needResize) {
           app.renderer.resolution = clampDPR(2)
           app.renderer.resize(w, h)
